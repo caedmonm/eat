@@ -1,16 +1,17 @@
 <?
 class eat{
-   public $token;
+   public $token, $error;
    private $private_key, $algo;
 
-	public function __construct($private_key,$algo="md5") {
+   public function __construct($private_key,$algo="md5") {
       $this->private_key = $private_key;
       $this->algo = $algo;
    }
 
    public function create($uid,$exp_date){
       if(strtotime($exp_date)<time()){
-         return "exp_date must be in the future";
+         $this->error = "exp_date must be in the future";
+         return false;
       }
       $string = $uid.$exp_date.$this->private_key;
       $hash = hash($this->algo,$string);
@@ -25,11 +26,13 @@ class eat{
       $test_hash = hash($this->algo,$string);
 
       if($test_hash!=$hash){
-         return "Hash doesn't match";
+         $this->error = "Hash doesn't match";
+         return false;
       }
 
       if(strtotime($exp_date)<time()){
-         return "exp_date must be in the future";
+         $this->error = "expired";
+         return false;
       }
 
       return "OK";
