@@ -35,6 +35,6 @@ class eat{
          return false;
       }
 
-      return "OK";
+      return true;
    }
 }
