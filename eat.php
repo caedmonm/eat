@@ -1,11 +1,15 @@
 <?
 class eat{
-   public $token, $error;
+   public $token, $error,$exclude;
    private $private_key, $algo;
 
-   public function __construct($private_key,$algo="md5") {
+	public function __construct($private_key,$algo="md5") {
       $this->private_key = $private_key;
       $this->algo = $algo;
+   }
+
+   public function exclusions($exclude){
+      $this->exclude = $exclude;
    }
 
    public function create($uid,$exp_date){
@@ -21,9 +25,13 @@ class eat{
 
    public function check($token){
       list($uid,$exp_date,$hash) = explode("|",$token);
-
       $string = $uid.$exp_date.$this->private_key;
       $test_hash = hash($this->algo,$string);
+
+      if(in_array($uid,$this->exclude)){
+         $this->error = "Excluded user";
+         return false;
+      }
 
       if($test_hash!=$hash){
          $this->error = "Hash doesn't match";
@@ -34,7 +42,6 @@ class eat{
          $this->error = "expired";
          return false;
       }
-
       return true;
    }
 }
